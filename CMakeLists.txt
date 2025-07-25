@@ -10,11 +10,13 @@ if(COMPILE_WITHOUT_MVS_SDK)
 endif()
 
 find_package(OpenCV REQUIRED)
+find_package(Boost REQUIRED COMPONENTS system filesystem)
 
 set(MVS_SDK_PATH "/opt/MVS")
 
 include_directories(
     ${OpenCV_INCLUDE_DIRS}
+    ${Boost_INCLUDE_DIRS}
     include
     ${MVS_SDK_PATH}/include/
 )
@@ -56,6 +58,7 @@ endif()
 
 add_library(hikrobot_camera_lib
     src/hikrobot_camera.cpp
+    src/plc.cpp
 )
 
 add_executable(${PROJECT_NAME}
@@ -66,11 +69,13 @@ if(USE_MVS_SDK)
     target_link_libraries(hikrobot_camera_lib
         ${OpenCV_LIBRARIES}
         ${FOUND_MVS_LIBS}
+        ${Boost_LIBRARIES}
         pthread
     )
 else()
     target_link_libraries(hikrobot_camera_lib
         ${OpenCV_LIBRARIES}
+        ${Boost_LIBRARIES}
         pthread
     )
 endif()
