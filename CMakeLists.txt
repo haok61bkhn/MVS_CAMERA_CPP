@@ -4,6 +4,11 @@ project(hikrobot_camera)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+option(COMPILE_WITHOUT_MVS_SDK "Compile without MVS SDK" OFF)
+if(COMPILE_WITHOUT_MVS_SDK)
+    add_definitions(-DCOMPILE_WITHOUT_MVS_SDK)
+endif()
+
 find_package(OpenCV REQUIRED)
 
 set(MVS_SDK_PATH "/opt/MVS")
@@ -43,28 +48,35 @@ endforeach()
 if(MISSING_MVS_LIBS)
     message(WARNING "Missing HIKROBOT libraries: ${MISSING_MVS_LIBS}")
     message(WARNING "Building without HIKROBOT SDK support. Install SDK for full functionality.")
-    add_definitions(-DCOMPILE_WITHOUT_MVS_SDK)
     set(USE_MVS_SDK FALSE)
 else()
     message(STATUS "Found all HIKROBOT libraries")
     set(USE_MVS_SDK TRUE)
 endif()
 
-add_executable(${PROJECT_NAME}
+add_library(hikrobot_camera_lib
     src/hikrobot_camera.cpp
 )
 
+add_executable(${PROJECT_NAME}
+    main.cpp
+)
+
 if(USE_MVS_SDK)
-    target_link_libraries(${PROJECT_NAME}
+    target_link_libraries(hikrobot_camera_lib
         ${OpenCV_LIBRARIES}
         ${FOUND_MVS_LIBS}
         pthread
     )
 else()
-    target_link_libraries(${PROJECT_NAME}
+    target_link_libraries(hikrobot_camera_lib
         ${OpenCV_LIBRARIES}
         pthread
     )
 endif()
+
+target_link_libraries(${PROJECT_NAME}
+    hikrobot_camera_lib
+)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
