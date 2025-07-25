@@ -1,0 +1,6 @@
+*.pyc
+*.onnx
+*.so
+*.o
+build/
+.vscode/
